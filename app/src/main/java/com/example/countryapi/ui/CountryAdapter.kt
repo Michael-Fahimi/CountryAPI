@@ -13,6 +13,8 @@ import com.example.countryapi.data.model.Country
 
 class CountryAdapter : ListAdapter<ListItem, RecyclerView.ViewHolder>(CountryDiffCallback()) {
 
+    // have to create to viewHolders for header and country items
+
     companion object {
         private const val VIEW_TYPE_HEADER = 0
         private const val VIEW_TYPE_COUNTRY = 1
@@ -48,6 +50,7 @@ class CountryAdapter : ListAdapter<ListItem, RecyclerView.ViewHolder>(CountryDif
         }
     }
 
+    // firsst viewHolder for header items
     class CountryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvNameRegion: TextView = itemView.findViewById(R.id.tvNameRegion)
         private val tvCode: TextView = itemView.findViewById(R.id.tvCode)
@@ -60,6 +63,8 @@ class CountryAdapter : ListAdapter<ListItem, RecyclerView.ViewHolder>(CountryDif
         }
     }
 
+
+    //second viewHolders for country items
     class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvHeaderLetter: TextView = itemView.findViewById(R.id.tvHeaderLetter)
 
@@ -68,6 +73,8 @@ class CountryAdapter : ListAdapter<ListItem, RecyclerView.ViewHolder>(CountryDif
         }
     }
 
+
+    // just for efficiency in updating the list
     class CountryDiffCallback : DiffUtil.ItemCallback<ListItem>() {
         override fun areItemsTheSame(oldItem: ListItem, newItem: ListItem): Boolean {
             return when {
