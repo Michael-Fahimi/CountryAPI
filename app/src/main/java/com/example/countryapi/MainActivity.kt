@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.countryapi.ui.CountryAdapter
 import com.example.countryapi.ui.CountryViewModel
+import com.example.countryapi.ui.StickyHeaderItemDecoration
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: CountryViewModel
@@ -35,13 +36,16 @@ class MainActivity : AppCompatActivity() {
         adapter = CountryAdapter()
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+
+        // Add sticky header decoration
+        recyclerView.addItemDecoration(StickyHeaderItemDecoration(recyclerView))
     }
 
     private fun setupViewModel() {
         viewModel = ViewModelProvider(this)[CountryViewModel::class.java]
 
-        viewModel.countries.observe(this) { countries ->
-            adapter.submitList(countries)
+        viewModel.listItems.observe(this) { listItems ->
+            adapter.submitList(listItems)
         }
 
         viewModel.error.observe(this) { error ->

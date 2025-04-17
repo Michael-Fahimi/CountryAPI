@@ -1,6 +1,5 @@
 package com.example.countryapi.ui
 
-// CountryAdapter.kt
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,18 +8,44 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.countryapi.R
+import com.example.countryapi.data.model.ListItem
 import com.example.countryapi.data.model.Country
 
-class CountryAdapter : ListAdapter<Country, CountryAdapter.CountryViewHolder>(CountryDiffCallback()) {
+class CountryAdapter : ListAdapter<ListItem, RecyclerView.ViewHolder>(CountryDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CountryViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_country, parent, false)
-        return CountryViewHolder(view)
+    companion object {
+        private const val VIEW_TYPE_HEADER = 0
+        private const val VIEW_TYPE_COUNTRY = 1
     }
 
-    override fun onBindViewHolder(holder: CountryViewHolder, position: Int) {
-        holder.bind(getItem(position))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            VIEW_TYPE_HEADER -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_header, parent, false)
+                HeaderViewHolder(view)
+            }
+            VIEW_TYPE_COUNTRY -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_country, parent, false)
+                CountryViewHolder(view)
+            }
+            else -> throw IllegalArgumentException("Invalid view type")
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (val item = getItem(position)) {
+            is ListItem.HeaderItem -> (holder as HeaderViewHolder).bind(item)
+            is ListItem.CountryItem -> (holder as CountryViewHolder).bind(item.country)
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when (getItem(position)) {
+            is ListItem.HeaderItem -> VIEW_TYPE_HEADER
+            is ListItem.CountryItem -> VIEW_TYPE_COUNTRY
+        }
     }
 
     class CountryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -35,12 +60,26 @@ class CountryAdapter : ListAdapter<Country, CountryAdapter.CountryViewHolder>(Co
         }
     }
 
-    class CountryDiffCallback : DiffUtil.ItemCallback<Country>() {
-        override fun areItemsTheSame(oldItem: Country, newItem: Country): Boolean {
-            return oldItem.code == newItem.code
+    class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val tvHeaderLetter: TextView = itemView.findViewById(R.id.tvHeaderLetter)
+
+        fun bind(headerItem: ListItem.HeaderItem) {
+            tvHeaderLetter.text = headerItem.letter.toString()
+        }
+    }
+
+    class CountryDiffCallback : DiffUtil.ItemCallback<ListItem>() {
+        override fun areItemsTheSame(oldItem: ListItem, newItem: ListItem): Boolean {
+            return when {
+                oldItem is ListItem.HeaderItem && newItem is ListItem.HeaderItem ->
+                    oldItem.letter == newItem.letter
+                oldItem is ListItem.CountryItem && newItem is ListItem.CountryItem ->
+                    oldItem.country.code == newItem.country.code
+                else -> false
+            }
         }
 
-        override fun areContentsTheSame(oldItem: Country, newItem: Country): Boolean {
+        override fun areContentsTheSame(oldItem: ListItem, newItem: ListItem): Boolean {
             return oldItem == newItem
         }
     }

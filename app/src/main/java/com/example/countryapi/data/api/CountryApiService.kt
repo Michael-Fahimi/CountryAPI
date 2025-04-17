@@ -7,9 +7,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 
 interface CountryApiService {
+    // endpoint to fetch countries
     @GET("peymano-wmt/32dcb892b06648910ddd40406e37fdab/raw/db25946fd77c5873b0303b858e861ce724e0dcd0/countries.json")
     suspend fun getCountries(): Response<List<Country>>
 
+
+    // static method to create the Retrofit instance
     companion object {
         private const val BASE_URL = "https://gist.githubusercontent.com/"
 
